@@ -157,5 +157,8 @@ print(inspect.getdoc(Person))
 # print(list(d))
 # print(input("输入："))
 # print("好了")
-
+oneStr="0123456"
+ok="23"
+print(oneStr.split())
+print(ok in oneStr)
         
