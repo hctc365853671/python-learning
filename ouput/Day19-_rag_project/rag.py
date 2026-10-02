@@ -38,7 +38,8 @@ def depositRag(knowledge_base:list[str],client):
     print(f"入库完成，共{len(knowledge_base)}条")
     return collection
 
-def getCorrelation(chatRequest:ChatRequest,collection,client):
+def getCorrelation(question:str,collection,client):
+    chatRequest=ChatRequest(content=question)
     requestRag=models.get_ali_embedding(chatRequest.content,client)
     requry=collection.query(
         query_embeddings=[requestRag],

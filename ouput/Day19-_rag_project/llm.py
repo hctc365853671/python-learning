@@ -1,3 +1,4 @@
+import json
 import os
 
 from dotenv import load_dotenv
@@ -17,16 +18,6 @@ def createClient():
 
 def get_response(chatRequest: ChatRequest, collection,client):
     try:
-        related = rag.getCorrelation(chatRequest, collection,client)
-        
-        if not related:
-            return {
-                "code": 200,
-                "message": "success",
-                "data": "根据现有资料无法回答"
-            }
-        
-        reference = "\n".join(related)
         messages = [
             {
                 "role": "system",
@@ -34,19 +25,53 @@ def get_response(chatRequest: ChatRequest, collection,client):
             },
             {
                 "role": "user",
-                "content": f"参考资料：\n{reference}\n\n用户问题：{chatRequest.content}"
+                "content": f"{chatRequest.content}"
             }
         ]
-        
-        completion = client.chat.completions.create(
-            model="qwen-plus-2025-07-28",
-            messages=messages
-        )
-        
-        return {
-            "code": 200,
-            "message": "success",
-            "data": completion.choices[0].message.content
-        }
+        tools=[
+            {
+                    "type": "function",
+                    "function": {
+                        "name": "getCorrelation",
+                        "description": "在知识库中查询与问题相关的内容",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "question": {
+                                    "type": "string",
+                                    "description": "用户输入的问题"
+                                }
+                            },
+                            "required": ["question"]
+                        }
+                    }
+            }
+        ]
+        while True:
+            response=client.chat.completions.create(
+                model="qwen-plus-2025-07-28",
+                messages=messages,
+                tools=tools,
+                tool_choice="auto"
+            )
+            msg=response.choices[0].message
+            if msg.tool_calls:
+                messages.append(msg)
+                for tool_call in msg.tool_calls:
+                    question = json.loads(tool_call.function.arguments).get("question")
+                    if tool_call.function.name == "getCorrelation":
+                        tool_result = rag.getCorrelation(question, collection, client)
+                        messages.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": "\n".join(tool_result)
+                        })
+            else:
+                return {
+                            "code": 200,
+                            "message": "success",
+                            "data": msg.content
+                        }
+               
     except Exception as e:
         return {"code": 500, "message": str(e)}
