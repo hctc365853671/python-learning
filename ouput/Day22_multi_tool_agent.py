@@ -94,17 +94,11 @@ def build_knowledge_base(manual, chunk_size=100, overlap=20):
             start += chunk_size - overlap
             
     return knowledge_base    
-def get_response(input:str, collection,client,allAiawners:list):
-        messages = [
-            {
-                "role": "system",
-                "content": "你是一个专业的产品助手。如果用户问天气请调用天气查询工具getWeather，如果客户要查产品知识库请调用getCorrelation工具，请严格根据参考资料回答，不要编造。如果资料不足，请回答：根据现有资料无法回答。"
-            },
-            {
+def get_response(input:str, collection,client,allAiawners:list,messages:list):
+        messages.append({
                 "role": "user",
                 "content": f"{input}"
-            }
-        ]
+            })
         tools=[
             {
                     "type": "function",
@@ -191,6 +185,10 @@ if __name__ == "__main__":
     konwledge_base=build_knowledge_base(product_manual)
     collection=depositRag(konwledge_base,client)
     allAiawners=[]
+    messages=[{
+                    "role": "system",
+                    "content": "你是一个专业的产品助手。如果用户问天气请调用天气查询工具getWeather，如果客户要查产品知识库请调用getCorrelation工具，请严格根据参考资料回答，不要编造。如果资料不足，请回答：根据现有资料无法回答。"
+                }]
     try:
         while True:
             user_input=input("请输入问题：")
