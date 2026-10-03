@@ -11,3 +11,6 @@ __pycache__/
 # 虚拟环境
 venv/
 .env
+
+# 本地向量库
+chroma_db

@@ -55,10 +55,11 @@ import json,csv
 stuInfo=[{"姓名":"洪晨","年龄":32,"爱好":"游戏"},
          {"姓名":"洪辉","年龄":27,"爱好":"跑步"},{"姓名":"罗雷","年龄":31,"爱好":"游戏"}]
 with open("students.json","w",encoding="utf-8") as file:
-        json.dump(stuInfo,file,ensure_ascii=False)
+        onejson=json.dump(stuInfo,file,ensure_ascii=False)
+        print(onejson)
 with open("students.json","r",encoding="utf-8") as file:
         suInfo=json.load(file)
-        print(suInfo)
+        print(suInfo.__class__)
 with open("students.csv","w",encoding="utf-8",newline="") as file:
         fileHead=list(suInfo[0])
         print(fileHead)

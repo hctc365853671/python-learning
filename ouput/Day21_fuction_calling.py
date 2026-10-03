@@ -28,8 +28,8 @@ def getWeather(city):
     except Exception:
         return {"code":500,"error": "网络似乎有问题"}
     
-def getresponse(client:OpenAI):
-    messages=[{"role": "user", "content": "今天天气怎么样"}]
+def getresponse(client:OpenAI,inpt:str):
+    messages=[{"role": "user", "content": f"{inpt}"}]
     tools=[{
                     "type": "function",
                     "function": {
@@ -72,7 +72,9 @@ def getresponse(client:OpenAI):
                         "content":json.dumps(tool_result,ensure_ascii=False)
                     })
         else:
-            print(msg)
+            print("AI回答:"+msg)
             break
+
+
 getresponse(createClient())
 
