@@ -88,13 +88,12 @@ def conversation():
         if not question:
             continue
         user_content={"role":"user","content":f"{question}"}
-        result=agent.invoke({"messages":[
-            {"role":"assistant","content":"\n".join(messages) if messages else ""},
-            user_content,
-        ]})
-        print("AI:",result["messages"][-1].content)
-        messages.append(question)
-        messages.append(result["messages"][-1].content)
+        messages.append(user_content)
+        result=agent.invoke({"messages":messages})
+        ai_answen=result["messages"][-1]
+        print("AI:",ai_answen.content)
+        messages.append(ai_answen)
+
 if __name__=="__main__":
     conversation()
 
@@ -105,7 +104,5 @@ Prompt          需要 agent_scratchpad + chat_history        主要用 system_p
 调用输入            {"input": "..."}                            {"messages": [...]}
 Memory          通过 AgentExecutor + Memory 对象    通常用 checkpointer 或手动传 messages
 代码量              相对多                                      更简洁
-经典写法看的非常明了先干什么后干什么，新写法跟我手写有点相似
-                                                
-
+经典写法看的非常明了先干什么后干什么，新写法跟我手写有agent点相似
 """
